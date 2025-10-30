@@ -1,6 +1,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+import { AdminLayout } from '@components/admin/AdminLayout'
 import { PageType } from '@types'
 
 const AdminDashboard: PageType = () => {
@@ -21,32 +22,12 @@ const AdminDashboard: PageType = () => {
       router.replace('/')
       return
     }
+
+    // Redirect to users page by default
+    router.replace('/admin/dashboard/users')
   }, [session, status, router])
 
-  if (status === 'loading' || !session) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh' 
-      }}>
-        <h2>Loading...</h2>
-      </div>
-    )
-  }
-
-  return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Admin Dashboard</h1>
-      <p>Welcome, {session.user?.name}!</p>
-      
-      <div style={{ marginTop: '2rem' }}>
-        <h2>Tournament Management System</h2>
-        <p>Coming soon: Users, Participants, and Tournaments sections</p>
-      </div>
-    </div>
-  )
+  return null
 }
 
 AdminDashboard.noNav = true
