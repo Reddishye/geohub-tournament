@@ -11,6 +11,7 @@ declare module 'next-auth' {
       avatar: { emoji: string; color: string }
       bio: string
       isAdmin: boolean
+      role?: 'ADMIN'
       distanceUnit: 'metric' | 'imperial'
       mapsAPIKey: string
     } & DefaultSession['user']
