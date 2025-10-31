@@ -3,6 +3,7 @@ import { createAdapter } from '@socket.io/redis-adapter'
 import Redis from 'ioredis'
 import { ObjectId } from 'mongodb'
 import { collections } from '@backend/utils'
+import { generateTournamentRounds } from '@backend/utils/generateTournamentRounds'
 
 const pubClient = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
 const subClient = pubClient.duplicate()
@@ -260,6 +261,9 @@ export function setupWebSocket(httpServer: any) {
     // Start tournament
     socket.on('tournament:start', async (tournamentId) => {
       try {
+        // Generate rounds based on fairness mode
+        await generateTournamentRounds(new ObjectId(tournamentId))
+
         await collections.tournaments?.findOneAndUpdate(
           { _id: new ObjectId(tournamentId) },
           {
