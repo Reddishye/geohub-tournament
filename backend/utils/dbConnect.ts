@@ -26,8 +26,7 @@ export const collections: {
 const MONGO_URI = process.env.MONGO_URI as string
 
 let cachedDb: Db | null = null
-
-const client = new MongoClient(MONGO_URI)
+let indexesCreated = false
 
 export const dbConnect = async () => {
   if (cachedDb) {
@@ -36,6 +35,7 @@ export const dbConnect = async () => {
   }
 
   try {
+    const client = new MongoClient(MONGO_URI)
     const dbConnection = await client.connect()
     const db = dbConnection.db(process.env.DB_NAME)
 
@@ -61,6 +61,13 @@ export const dbConnect = async () => {
     collections.tournamentParticipants = db.collection('tournamentParticipants')
     collections.rounds = db.collection('rounds')
     collections.tournamentGuesses = db.collection('tournamentGuesses')
+
+    // Create indexes on first connection
+    if (!indexesCreated) {
+      const { default: createTournamentIndexes } = await import('./createTournamentIndexes')
+      await createTournamentIndexes()
+      indexesCreated = true
+    }
 
     return cachedDb
   } catch (err) {
