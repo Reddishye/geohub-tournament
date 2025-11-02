@@ -1,6 +1,6 @@
 import { Collection, Db, MongoClient } from 'mongodb'
 import { RecentSearch, UserBansType, FeatureFlagsType } from '@types'
-import { MapLeaderboard } from '@backend/models'
+import { MapLeaderboard, Participant, Tournament, TournamentParticipant, Round, TournamentGuess } from '@backend/models'
 
 export const collections: {
   users?: Collection
@@ -16,13 +16,17 @@ export const collections: {
   mapLeaderboard?: Collection<MapLeaderboard>
   userBans?: Collection<UserBansType>
   analytics?: Collection
+  participants?: Collection<Participant>
+  tournaments?: Collection<Tournament>
+  tournamentParticipants?: Collection<TournamentParticipant>
+  rounds?: Collection<Round>
+  tournamentGuesses?: Collection<TournamentGuess>
 } = {}
 
 const MONGO_URI = process.env.MONGO_URI as string
 
 let cachedDb: Db | null = null
-
-const client = new MongoClient(MONGO_URI)
+let indexesCreated = false
 
 export const dbConnect = async () => {
   if (cachedDb) {
@@ -31,6 +35,7 @@ export const dbConnect = async () => {
   }
 
   try {
+    const client = new MongoClient(MONGO_URI)
     const dbConnection = await client.connect()
     const db = dbConnection.db(process.env.DB_NAME)
 
@@ -51,6 +56,18 @@ export const dbConnect = async () => {
     collections.mapLeaderboard = db.collection('mapLeaderboard')
     collections.userBans = db.collection('userBans')
     collections.analytics = db.collection('analytics')
+    collections.participants = db.collection('participants')
+    collections.tournaments = db.collection('tournaments')
+    collections.tournamentParticipants = db.collection('tournamentParticipants')
+    collections.rounds = db.collection('rounds')
+    collections.tournamentGuesses = db.collection('tournamentGuesses')
+
+    // Create indexes on first connection
+    if (!indexesCreated) {
+      const { default: createTournamentIndexes } = await import('./createTournamentIndexes')
+      await createTournamentIndexes()
+      indexesCreated = true
+    }
 
     return cachedDb
   } catch (err) {

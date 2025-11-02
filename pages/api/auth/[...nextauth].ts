@@ -47,6 +47,7 @@ export const authOptions: NextAuthOptions = {
           avatar: user.avatar,
           bio: user.bio,
           isAdmin: user.isAdmin,
+          role: user.role,
           distanceUnit: user.distanceUnit,
           mapsAPIKey: decrypedMapsAPIKey,
         }

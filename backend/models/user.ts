@@ -9,6 +9,7 @@ type User = {
   avatar: { emoji: string; color: string }
   createdAt?: Date
   isAdmin?: boolean
+  role?: 'ADMIN' // New role field for tournament system
 }
 
 export default User
