@@ -164,9 +164,9 @@ export function setupWebSocket(httpServer: any) {
           {
             $set: {
               totalScore,
-              averageDistance: avgDistance,
-              currentRound: (socket.data.participant.currentRound || 0) + 1
-            }
+              averageDistance: avgDistance
+            },
+            $inc: { currentRound: 1 }
           }
         )
 
